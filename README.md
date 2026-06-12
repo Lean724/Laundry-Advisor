@@ -1,5 +1,8 @@
 # Laundry Advisor
 
+[![HACS validation](https://github.com/Lean724/Laundry-Advisor/actions/workflows/hacs.yml/badge.svg)](https://github.com/Lean724/Laundry-Advisor/actions/workflows/hacs.yml)
+[![Hassfest](https://github.com/Lean724/Laundry-Advisor/actions/workflows/hassfest.yml/badge.svg)](https://github.com/Lean724/Laundry-Advisor/actions/workflows/hassfest.yml)
+
 Laundry Advisor is a Home Assistant custom integration that analyzes weather
 forecasts and recommends whether it is a good moment to wash clothes and dry
 them outdoors.
@@ -92,6 +95,8 @@ An hour is suitable for drying when:
 ## Installation
 
 ### HACS custom repository
+
+[![Open your Home Assistant instance and add this repository to HACS.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Lean724&repository=Laundry-Advisor&category=integration)
 
 1. Open HACS.
 2. Go to **Integrations**.
