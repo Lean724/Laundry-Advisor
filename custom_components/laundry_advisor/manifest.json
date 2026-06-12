@@ -1,0 +1,13 @@
+{
+  "domain": "laundry_advisor",
+  "name": "Laundry Advisor",
+  "after_dependencies": ["weather"],
+  "codeowners": ["@leandrorotela"],
+  "config_flow": true,
+  "documentation": "https://github.com/leandrorotela/laundry-advisor",
+  "integration_type": "service",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/leandrorotela/laundry-advisor/issues",
+  "requirements": [],
+  "version": "0.1.0"
+}

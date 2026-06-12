@@ -1,0 +1,54 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Laundry Advisor",
+        "description": "Elegí la entidad meteorológica que se usará para calcular las condiciones de secado al aire libre.",
+        "data": {
+          "weather_entity": "Entidad meteorológica",
+          "forecast_hours": "Horizonte del pronóstico",
+          "update_interval": "Intervalo de actualización"
+        }
+      }
+    },
+    "error": {
+      "invalid_weather_entity": "Seleccioná una entidad meteorológica válida."
+    },
+    "abort": {
+      "already_configured": "Esta entidad meteorológica ya está configurada."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Opciones de Laundry Advisor",
+        "data": {
+          "weather_entity": "Entidad meteorológica",
+          "forecast_hours": "Horizonte del pronóstico",
+          "update_interval": "Intervalo de actualización"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "laundry_index": {
+        "name": "Índice de lavado"
+      },
+      "laundry_status": {
+        "name": "Estado de lavado"
+      },
+      "laundry_recommendation": {
+        "name": "Recomendación de lavado"
+      },
+      "laundry_drying_window": {
+        "name": "Ventana de secado"
+      }
+    },
+    "binary_sensor": {
+      "laundry_good_day": {
+        "name": "Buen día para lavar"
+      }
+    }
+  }
+}

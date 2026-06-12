@@ -1,0 +1,32 @@
+[tool.ruff]
+target-version = "py313"
+line-length = 88
+src = ["custom_components"]
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+  "ANN401",
+  "ARG001",
+  "COM812",
+  "D203",
+  "D213",
+  "EM101",
+  "PLR2004",
+  "TRY003"
+]
+
+[tool.ruff.lint.per-file-ignores]
+"custom_components/laundry_advisor/translations/*.json" = ["ALL"]
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+warn_unused_configs = true
+namespace_packages = true
+explicit_package_bases = true
+mypy_path = "."
+
+[[tool.mypy.overrides]]
+module = ["homeassistant.*", "voluptuous"]
+ignore_missing_imports = true

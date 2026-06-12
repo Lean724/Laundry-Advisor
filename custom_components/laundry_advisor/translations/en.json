@@ -1,0 +1,54 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Laundry Advisor",
+        "description": "Choose the weather entity used to calculate outdoor laundry drying conditions.",
+        "data": {
+          "weather_entity": "Weather entity",
+          "forecast_hours": "Forecast horizon",
+          "update_interval": "Update interval"
+        }
+      }
+    },
+    "error": {
+      "invalid_weather_entity": "Select a valid weather entity."
+    },
+    "abort": {
+      "already_configured": "This weather entity is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Laundry Advisor options",
+        "data": {
+          "weather_entity": "Weather entity",
+          "forecast_hours": "Forecast horizon",
+          "update_interval": "Update interval"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "laundry_index": {
+        "name": "Laundry index"
+      },
+      "laundry_status": {
+        "name": "Laundry status"
+      },
+      "laundry_recommendation": {
+        "name": "Laundry recommendation"
+      },
+      "laundry_drying_window": {
+        "name": "Laundry drying window"
+      }
+    },
+    "binary_sensor": {
+      "laundry_good_day": {
+        "name": "Laundry good day"
+      }
+    }
+  }
+}
