@@ -1,13 +1,17 @@
 {
   "domain": "laundry_advisor",
   "name": "Laundry Advisor",
-  "after_dependencies": ["weather"],
-  "codeowners": ["@Lean724"],
+  "after_dependencies": [
+    "weather"
+  ],
+  "codeowners": [
+    "@Lean724"
+  ],
   "config_flow": true,
   "documentation": "https://github.com/Lean724/Laundry-Advisor",
   "integration_type": "service",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/Lean724/Laundry-Advisor/issues",
   "requirements": [],
-  "version": "2.0.1"
+  "version": "2.0.2"
 }
