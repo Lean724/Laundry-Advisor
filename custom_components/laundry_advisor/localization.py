@@ -1,5 +1,7 @@
 """Localization strings and helpers for Laundry Advisor sensor responses."""
 
+# ruff: noqa: RUF001
+
 from __future__ import annotations
 
 from dataclasses import dataclass
