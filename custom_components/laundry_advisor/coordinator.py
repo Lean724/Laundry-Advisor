@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Any, Protocol, cast
 
-from homeassistant.components.weather import Forecast, async_get_forecasts
+from homeassistant.components.weather import Forecast
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
@@ -167,25 +167,32 @@ class LaundryAdvisorCoordinator(DataUpdateCoordinator[LaundryAdvisorData]):
             tomorrow_index=tomorrow_index,
         )
 
+    async def _async_get_forecast_points(
+        self,
+        forecast_type: str,
+    ) -> list[LaundryForecastPoint]:
+        """Fetch forecast data from weather entity using Home Assistant action."""
+        response = await self.hass.services.async_call(
+            domain="weather",
+            service="get_forecasts",
+            service_data={
+                "entity_id": self.weather_entity,
+                "type": forecast_type,
+            },
+            blocking=True,
+            return_response=True,
+        )
+        forecast_dict = cast(dict[str, Any], response or {})
+        raw_forecast = _extract_forecast_list(forecast_dict, self.weather_entity)
+        return [_normalize_forecast_point(item) for item in raw_forecast]
+
     async def _async_get_hourly_forecast(self) -> list[LaundryForecastPoint]:
         """Fetch and normalize an hourly forecast using Home Assistant APIs."""
-        forecasts = await async_get_forecasts(
-            self.hass,
-            [self.weather_entity],
-            HOURLY_FORECAST_TYPE,
-        )
-        raw_forecast = _extract_forecast_list(forecasts, self.weather_entity)
-        return [_normalize_forecast_point(item) for item in raw_forecast]
+        return await self._async_get_forecast_points(HOURLY_FORECAST_TYPE)
 
     async def _async_get_daily_forecast_as_points(self) -> list[LaundryForecastPoint]:
         """Fallback for weather entities that only expose daily forecasts."""
-        forecasts = await async_get_forecasts(
-            self.hass,
-            [self.weather_entity],
-            DAILY_FORECAST_TYPE,
-        )
-        raw_forecast = _extract_forecast_list(forecasts, self.weather_entity)
-        points = [_normalize_forecast_point(item) for item in raw_forecast]
+        points = await self._async_get_forecast_points(DAILY_FORECAST_TYPE)
         expanded: list[LaundryForecastPoint] = []
 
         for point in points:
