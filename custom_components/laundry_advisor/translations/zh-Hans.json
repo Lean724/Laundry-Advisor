@@ -1,0 +1,74 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Laundry Advisor",
+        "description": "选择用于计算户外衣物晾晒条件的气象实体。",
+        "data": {
+          "weather_entity": "气象实体",
+          "forecast_hours": "预报时长",
+          "update_interval": "更新间隔"
+        },
+        "data_description": {
+          "weather_entity": "提供每小时或每日天气预报数据的气象实体。",
+          "forecast_hours": "要分析的预报小时数（3-48 小时）。",
+          "update_interval": "重新计算洗衣晾晒建议的频率（5-240 分钟）。"
+        }
+      }
+    },
+    "error": {
+      "invalid_weather_entity": "请选择有效的气象实体。"
+    },
+    "abort": {
+      "already_configured": "该气象实体已配置。"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Laundry Advisor 选项",
+        "description": "更新气象实体、预报时长或更新间隔。",
+        "data": {
+          "weather_entity": "气象实体",
+          "forecast_hours": "预报时长",
+          "update_interval": "更新间隔"
+        },
+        "data_description": {
+          "weather_entity": "提供每小时或每日天气预报数据的气象实体。",
+          "forecast_hours": "要分析的预报小时数（3-48 小时）。",
+          "update_interval": "重新计算洗衣晾晒建议的频率（5-240 分钟）。"
+        }
+      }
+    },
+    "error": {
+      "invalid_weather_entity": "请选择有效的气象实体。"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "laundry_index": {
+        "name": "洗衣晾晒指数"
+      },
+      "laundry_status": {
+        "name": "洗衣晾晒状态",
+        "state": {
+          "excellent": "极佳",
+          "good": "良好",
+          "fair": "一般",
+          "poor": "较差"
+        }
+      },
+      "laundry_recommendation": {
+        "name": "洗衣晾晒建议"
+      },
+      "laundry_drying_window": {
+        "name": "最佳晾晒时段"
+      }
+    },
+    "binary_sensor": {
+      "laundry_good_day": {
+        "name": "适合洗衣日"
+      }
+    }
+  }
+}

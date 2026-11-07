@@ -8,6 +8,11 @@
           "weather_entity": "Weather entity",
           "forecast_hours": "Forecast horizon",
           "update_interval": "Update interval"
+        },
+        "data_description": {
+          "weather_entity": "Weather entity that provides hourly or daily forecast data.",
+          "forecast_hours": "Number of forecast hours to analyze (3-48 hours).",
+          "update_interval": "How often to recalculate the laundry advice (5-240 minutes)."
         }
       }
     },
@@ -22,12 +27,21 @@
     "step": {
       "init": {
         "title": "Laundry Advisor options",
+        "description": "Update the weather entity, forecast horizon, or update interval.",
         "data": {
           "weather_entity": "Weather entity",
           "forecast_hours": "Forecast horizon",
           "update_interval": "Update interval"
+        },
+        "data_description": {
+          "weather_entity": "Weather entity that provides hourly or daily forecast data.",
+          "forecast_hours": "Number of forecast hours to analyze (3-48 hours).",
+          "update_interval": "How often to recalculate the laundry advice (5-240 minutes)."
         }
       }
+    },
+    "error": {
+      "invalid_weather_entity": "Select a valid weather entity."
     }
   },
   "entity": {
@@ -36,7 +50,13 @@
         "name": "Laundry index"
       },
       "laundry_status": {
-        "name": "Laundry status"
+        "name": "Laundry status",
+        "state": {
+          "excellent": "Excellent",
+          "good": "Good",
+          "fair": "Fair",
+          "poor": "Poor"
+        }
       },
       "laundry_recommendation": {
         "name": "Laundry recommendation"

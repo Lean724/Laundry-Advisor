@@ -1,9 +1,11 @@
-"""Tests for Laundry Advisor calculation engine."""
+"""Tests for Laundry Advisor calculation engine and localization."""
 
 # Pre-import test environment mocks
 import tests  # noqa: F401, I001
-from datetime import datetime, timedelta, timezone
+import json
 import unittest
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 from custom_components.laundry_advisor.const import (
     DRYING_WINDOW_NONE,
@@ -11,6 +13,7 @@ from custom_components.laundry_advisor.const import (
     STATUS_FAIR,
     STATUS_GOOD,
     STATUS_POOR,
+    SUPPORTED_LANGUAGES,
 )
 from custom_components.laundry_advisor.coordinator import (
     LaundryForecastPoint,
@@ -19,6 +22,23 @@ from custom_components.laundry_advisor.coordinator import (
     calculate_laundry_index,
     status_from_index,
 )
+from custom_components.laundry_advisor.localization import (
+    LOCALIZED_STRINGS,
+    get_localized_strings,
+    is_no_drying_window,
+    normalize_language,
+)
+
+
+def _collect_keys(data: dict, prefix: str = "") -> set[str]:
+    """Recursively collect all key paths in a JSON dictionary."""
+    keys: set[str] = set()
+    for key, value in data.items():
+        full_key = f"{prefix}.{key}" if prefix else key
+        keys.add(full_key)
+        if isinstance(value, dict):
+            keys.update(_collect_keys(value, full_key))
+    return keys
 
 
 class TestLaundryAdvisorEngine(unittest.TestCase):
@@ -156,6 +176,111 @@ class TestLaundryAdvisorEngine(unittest.TestCase):
             tomorrow_index=80,
         )
         self.assertIn("Tomorrow offers substantially better drying conditions.", rec)
+
+    def test_language_normalization(self) -> None:
+        """Test normalization of Home Assistant language codes."""
+        self.assertEqual(normalize_language("it"), "it")
+        self.assertEqual(normalize_language("it-IT"), "it")
+        self.assertEqual(normalize_language("en-US"), "en")
+        self.assertEqual(normalize_language("es-AR"), "es")
+        self.assertEqual(normalize_language("pt-BR"), "pt")
+        self.assertEqual(normalize_language("ru-RU"), "ru")
+        self.assertEqual(normalize_language("de-DE"), "de")
+        self.assertEqual(normalize_language("fr-FR"), "fr")
+        self.assertEqual(normalize_language("zh-Hans"), "zh-Hans")
+        self.assertEqual(normalize_language("zh-CN"), "zh-Hans")
+        self.assertEqual(normalize_language("zh_CN"), "zh-Hans")
+        self.assertEqual(normalize_language("unknown"), "en")
+        self.assertEqual(normalize_language(None), "en")
+
+    def test_localized_sensor_responses_all_languages(self) -> None:
+        """Test localized sensor responses across all 8 required languages."""
+        rain_points = [
+            LaundryForecastPoint(
+                datetime=self.base_time + timedelta(hours=i),
+                temperature=24.0,
+                humidity=50.0,
+                precipitation_probability=60.0 if i >= 4 else 5.0,
+                wind_speed=12.0,
+                condition="rainy" if i >= 4 else "sunny",
+            )
+            for i in range(8)
+        ]
+
+        for lang in SUPPORTED_LANGUAGES:
+            strings = get_localized_strings(lang)
+
+            # Status localization
+            self.assertEqual(status_from_index(85, lang), strings.status_excellent)
+            self.assertEqual(status_from_index(65, lang), strings.status_good)
+            self.assertEqual(status_from_index(45, lang), strings.status_fair)
+            self.assertEqual(status_from_index(20, lang), strings.status_poor)
+
+            # Drying window localization when no suitable window exists
+            no_window = calculate_drying_window((), lang)
+            self.assertEqual(no_window, strings.drying_window_none)
+            self.assertTrue(is_no_drying_window(no_window))
+
+            # Recommendation localization with rain time and tomorrow comparison
+            rec = build_recommendation(
+                index=65,
+                status=strings.status_good,
+                forecast=rain_points,
+                drying_window="08:00-12:00",
+                tomorrow_index=85,
+                language=lang,
+            )
+            self.assertIn("12:00", rec)
+            self.assertIn(strings.rec_tomorrow_better, rec)
+
+            # Recommendation when no drying window is available
+            rec_none = build_recommendation(
+                index=30,
+                status=strings.status_poor,
+                forecast=(),
+                drying_window=no_window,
+                tomorrow_index=None,
+                language=lang,
+            )
+            self.assertEqual(rec_none, strings.rec_no_window)
+
+    def test_translation_files_match_strings_json(self) -> None:
+        """Verify all translation JSON files exist and match strings.json keys."""
+        base_dir = (
+            Path(__file__).resolve().parent.parent
+            / "custom_components"
+            / "laundry_advisor"
+        )
+        strings_path = base_dir / "strings.json"
+        translations_dir = base_dir / "translations"
+
+        with strings_path.open(encoding="utf-8") as f:
+            strings_data = json.load(f)
+        expected_keys = _collect_keys(strings_data)
+
+        required_files = [
+            "en.json",
+            "es.json",
+            "it.json",
+            "pt.json",
+            "pt-BR.json",
+            "ru.json",
+            "de.json",
+            "fr.json",
+            "zh-Hans.json",
+        ]
+        for filename in required_files:
+            file_path = translations_dir / filename
+            self.assertTrue(file_path.exists(), f"Missing translation file: {filename}")
+            with file_path.open(encoding="utf-8") as f:
+                trans_data = json.load(f)
+            self.assertEqual(
+                _collect_keys(trans_data),
+                expected_keys,
+                f"Key mismatch in {filename}",
+            )
+
+        self.assertEqual(set(LOCALIZED_STRINGS.keys()), set(SUPPORTED_LANGUAGES))
 
 
 if __name__ == "__main__":

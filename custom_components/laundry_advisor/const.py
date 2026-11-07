@@ -14,6 +14,18 @@ CONF_UPDATE_INTERVAL: Final = "update_interval"
 DEFAULT_FORECAST_HOURS: Final = 12
 DEFAULT_UPDATE_INTERVAL_MINUTES: Final = 30
 DEFAULT_UPDATE_INTERVAL: Final = timedelta(minutes=DEFAULT_UPDATE_INTERVAL_MINUTES)
+DEFAULT_LANGUAGE: Final = "en"
+
+SUPPORTED_LANGUAGES: Final[tuple[str, ...]] = (
+    "en",
+    "es",
+    "it",
+    "pt",
+    "ru",
+    "de",
+    "fr",
+    "zh-Hans",
+)
 
 MIN_FORECAST_HOURS: Final = 3
 MAX_FORECAST_HOURS: Final = 48

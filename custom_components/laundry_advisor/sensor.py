@@ -6,7 +6,11 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
-from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
+from homeassistant.components.sensor import (
+    SensorEntity,
+    SensorEntityDescription,
+    SensorStateClass,
+)
 from homeassistant.const import PERCENTAGE, EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
@@ -30,6 +34,7 @@ SENSOR_DESCRIPTIONS: tuple[LaundryAdvisorSensorEntityDescription, ...] = (
         key="laundry_index",
         translation_key="laundry_index",
         native_unit_of_measurement=PERCENTAGE,
+        state_class=SensorStateClass.MEASUREMENT,
         suggested_display_precision=0,
         icon="mdi:washing-machine",
         value_fn=lambda data: data.index,

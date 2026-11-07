@@ -1,0 +1,74 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Laundry Advisor",
+        "description": "Wählen Sie die Wetter-Entität aus, die zur Berechnung der Bedingungen für das Wäschetrocknen im Freien verwendet wird.",
+        "data": {
+          "weather_entity": "Wetter-Entität",
+          "forecast_hours": "Vorhersagehorizont",
+          "update_interval": "Aktualisierungsintervall"
+        },
+        "data_description": {
+          "weather_entity": "Wetter-Entität, die stündliche oder tägliche Vorhersagedaten bereitstellt.",
+          "forecast_hours": "Anzahl der zu analysierenden Vorhersagestunden (3–48 Stunden).",
+          "update_interval": "Wie oft die Waschempfehlung neu berechnet werden soll (5–240 Minuten)."
+        }
+      }
+    },
+    "error": {
+      "invalid_weather_entity": "Bitte wählen Sie eine gültige Wetter-Entität aus."
+    },
+    "abort": {
+      "already_configured": "Diese Wetter-Entität ist bereits konfiguriert."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Laundry Advisor Optionen",
+        "description": "Aktualisieren Sie die Wetter-Entität, den Vorhersagehorizont oder das Aktualisierungsintervall.",
+        "data": {
+          "weather_entity": "Wetter-Entität",
+          "forecast_hours": "Vorhersagehorizont",
+          "update_interval": "Aktualisierungsintervall"
+        },
+        "data_description": {
+          "weather_entity": "Wetter-Entität, die stündliche oder tägliche Vorhersagedaten bereitstellt.",
+          "forecast_hours": "Anzahl der zu analysierenden Vorhersagestunden (3–48 Stunden).",
+          "update_interval": "Wie oft die Waschempfehlung neu berechnet werden soll (5–240 Minuten)."
+        }
+      }
+    },
+    "error": {
+      "invalid_weather_entity": "Bitte wählen Sie eine gültige Wetter-Entität aus."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "laundry_index": {
+        "name": "Wäsche-Index"
+      },
+      "laundry_status": {
+        "name": "Wäsche-Status",
+        "state": {
+          "excellent": "Ausgezeichnet",
+          "good": "Gut",
+          "fair": "Mäßig",
+          "poor": "Schlecht"
+        }
+      },
+      "laundry_recommendation": {
+        "name": "Waschempfehlung"
+      },
+      "laundry_drying_window": {
+        "name": "Trocknungsfenster"
+      }
+    },
+    "binary_sensor": {
+      "laundry_good_day": {
+        "name": "Guter Waschtag"
+      }
+    }
+  }
+}

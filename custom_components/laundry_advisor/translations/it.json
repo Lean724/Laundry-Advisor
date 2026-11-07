@@ -1,0 +1,74 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Laundry Advisor",
+        "description": "Scegli l'entità meteo utilizzata per calcolare le condizioni di asciugatura del bucato all'aperto.",
+        "data": {
+          "weather_entity": "Entità meteo",
+          "forecast_hours": "Orizzonte di previsione",
+          "update_interval": "Intervallo di aggiornamento"
+        },
+        "data_description": {
+          "weather_entity": "Entità meteo che fornisce dati di previsione orari o giornalieri.",
+          "forecast_hours": "Numero di ore di previsione da analizzare (3-48 ore).",
+          "update_interval": "Frequenza di ricalcolo dei consigli per il bucato (5-240 minuti)."
+        }
+      }
+    },
+    "error": {
+      "invalid_weather_entity": "Seleziona un'entità meteo valida."
+    },
+    "abort": {
+      "already_configured": "Questa entità meteo è già configurata."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Opzioni di Laundry Advisor",
+        "description": "Aggiorna l'entità meteo, l'orizzonte di previsione o l'intervallo di aggiornamento.",
+        "data": {
+          "weather_entity": "Entità meteo",
+          "forecast_hours": "Orizzonte di previsione",
+          "update_interval": "Intervallo di aggiornamento"
+        },
+        "data_description": {
+          "weather_entity": "Entità meteo che fornisce dati di previsione orari o giornalieri.",
+          "forecast_hours": "Numero di ore di previsione da analizzare (3-48 ore).",
+          "update_interval": "Frequenza di ricalcolo dei consigli per il bucato (5-240 minuti)."
+        }
+      }
+    },
+    "error": {
+      "invalid_weather_entity": "Seleziona un'entità meteo valida."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "laundry_index": {
+        "name": "Indice bucato"
+      },
+      "laundry_status": {
+        "name": "Stato bucato",
+        "state": {
+          "excellent": "Eccellente",
+          "good": "Buono",
+          "fair": "Discreto",
+          "poor": "Scarso"
+        }
+      },
+      "laundry_recommendation": {
+        "name": "Consiglio bucato"
+      },
+      "laundry_drying_window": {
+        "name": "Finestra di asciugatura"
+      }
+    },
+    "binary_sensor": {
+      "laundry_good_day": {
+        "name": "Buona giornata per il bucato"
+      }
+    }
+  }
+}

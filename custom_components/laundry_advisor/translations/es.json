@@ -8,6 +8,11 @@
           "weather_entity": "Entidad meteorológica",
           "forecast_hours": "Horizonte del pronóstico",
           "update_interval": "Intervalo de actualización"
+        },
+        "data_description": {
+          "weather_entity": "Entidad meteorológica que proporciona datos de pronóstico por hora o diario.",
+          "forecast_hours": "Cantidad de horas de pronóstico a analizar (3-48 horas).",
+          "update_interval": "Frecuencia con la que se recalcula la recomendación de lavado (5-240 minutos)."
         }
       }
     },
@@ -22,12 +27,21 @@
     "step": {
       "init": {
         "title": "Opciones de Laundry Advisor",
+        "description": "Actualizá la entidad meteorológica, el horizonte del pronóstico o el intervalo de actualización.",
         "data": {
           "weather_entity": "Entidad meteorológica",
           "forecast_hours": "Horizonte del pronóstico",
           "update_interval": "Intervalo de actualización"
+        },
+        "data_description": {
+          "weather_entity": "Entidad meteorológica que proporciona datos de pronóstico por hora o diario.",
+          "forecast_hours": "Cantidad de horas de pronóstico a analizar (3-48 horas).",
+          "update_interval": "Frecuencia con la que se recalcula la recomendación de lavado (5-240 minutos)."
         }
       }
+    },
+    "error": {
+      "invalid_weather_entity": "Seleccioná una entidad meteorológica válida."
     }
   },
   "entity": {
@@ -36,7 +50,13 @@
         "name": "Índice de lavado"
       },
       "laundry_status": {
-        "name": "Estado de lavado"
+        "name": "Estado de lavado",
+        "state": {
+          "excellent": "Excelente",
+          "good": "Bueno",
+          "fair": "Regular",
+          "poor": "Malo"
+        }
       },
       "laundry_recommendation": {
         "name": "Recomendación de lavado"

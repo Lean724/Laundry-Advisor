@@ -1,0 +1,74 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Laundry Advisor",
+        "description": "Выберите погодный объект, используемый для расчёта условий сушки белья на открытом воздухе.",
+        "data": {
+          "weather_entity": "Погодный объект",
+          "forecast_hours": "Горизонт прогноза",
+          "update_interval": "Интервал обновления"
+        },
+        "data_description": {
+          "weather_entity": "Погодный объект, предоставляющий почасовой или ежедневный прогноз погоды.",
+          "forecast_hours": "Количество часов прогноза для анализа (3–48 часов).",
+          "update_interval": "Частота пересчёта рекомендаций по стирке (5–240 минут)."
+        }
+      }
+    },
+    "error": {
+      "invalid_weather_entity": "Выберите корректный погодный объект."
+    },
+    "abort": {
+      "already_configured": "Этот погодный объект уже настроен."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Параметры Laundry Advisor",
+        "description": "Обновите погодный объект, горизонт прогноза или интервал обновления.",
+        "data": {
+          "weather_entity": "Погодный объект",
+          "forecast_hours": "Горизонт прогноза",
+          "update_interval": "Интервал обновления"
+        },
+        "data_description": {
+          "weather_entity": "Погодный объект, предоставляющий почасовой или ежедневный прогноз погоды.",
+          "forecast_hours": "Количество часов прогноза для анализа (3–48 часов).",
+          "update_interval": "Частота пересчёта рекомендаций по стирке (5–240 минут)."
+        }
+      }
+    },
+    "error": {
+      "invalid_weather_entity": "Выберите корректный погодный объект."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "laundry_index": {
+        "name": "Индекс стирки"
+      },
+      "laundry_status": {
+        "name": "Статус стирки",
+        "state": {
+          "excellent": "Отлично",
+          "good": "Хорошо",
+          "fair": "Удовлетворительно",
+          "poor": "Плохо"
+        }
+      },
+      "laundry_recommendation": {
+        "name": "Рекомендация по стирке"
+      },
+      "laundry_drying_window": {
+        "name": "Окно для сушки"
+      }
+    },
+    "binary_sensor": {
+      "laundry_good_day": {
+        "name": "Подходящий день для стирки"
+      }
+    }
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Laundry Advisor",
+        "description": "Escolha a entidade meteorológica usada para calcular as condições de secagem de roupas ao ar livre.",
+        "data": {
+          "weather_entity": "Entidade meteorológica",
+          "forecast_hours": "Horizonte de previsão",
+          "update_interval": "Intervalo de atualização"
+        },
+        "data_description": {
+          "weather_entity": "Entidade meteorológica que fornece dados de previsão por hora ou diária.",
+          "forecast_hours": "Número de horas de previsão a analisar (3-48 horas).",
+          "update_interval": "Com que frequência recalcular a recomendação de lavagem (5-240 minutos)."
+        }
+      }
+    },
+    "error": {
+      "invalid_weather_entity": "Selecione uma entidade meteorológica válida."
+    },
+    "abort": {
+      "already_configured": "Esta entidade meteorológica já está configurada."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Opções do Laundry Advisor",
+        "description": "Atualize a entidade meteorológica, o horizonte de previsão ou o intervalo de atualização.",
+        "data": {
+          "weather_entity": "Entidade meteorológica",
+          "forecast_hours": "Horizonte de previsão",
+          "update_interval": "Intervalo de atualização"
+        },
+        "data_description": {
+          "weather_entity": "Entidade meteorológica que fornece dados de previsão por hora ou diária.",
+          "forecast_hours": "Número de horas de previsão a analisar (3-48 horas).",
+          "update_interval": "Com que frequência recalcular a recomendação de lavagem (5-240 minutos)."
+        }
+      }
+    },
+    "error": {
+      "invalid_weather_entity": "Selecione uma entidade meteorológica válida."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "laundry_index": {
+        "name": "Índice de lavagem"
+      },
+      "laundry_status": {
+        "name": "Estado da lavagem",
+        "state": {
+          "excellent": "Excelente",
+          "good": "Bom",
+          "fair": "Razoável",
+          "poor": "Fraco"
+        }
+      },
+      "laundry_recommendation": {
+        "name": "Recomendação de lavagem"
+      },
+      "laundry_drying_window": {
+        "name": "Janela de secagem"
+      }
+    },
+    "binary_sensor": {
+      "laundry_good_day": {
+        "name": "Bom dia para lavar roupa"
+      }
+    }
+  }
+}

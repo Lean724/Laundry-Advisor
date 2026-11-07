@@ -1,0 +1,74 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Laundry Advisor",
+        "description": "Choisissez l'entité météo utilisée pour calculer les conditions de séchage du linge en extérieur.",
+        "data": {
+          "weather_entity": "Entité météo",
+          "forecast_hours": "Horizon de prévision",
+          "update_interval": "Intervalle de mise à jour"
+        },
+        "data_description": {
+          "weather_entity": "Entité météo fournissant des prévisions horaires ou quotidiennes.",
+          "forecast_hours": "Nombre d'heures de prévision à analyser (3 à 48 heures).",
+          "update_interval": "Fréquence de recalcul des recommandations de lessive (5 à 240 minutes)."
+        }
+      }
+    },
+    "error": {
+      "invalid_weather_entity": "Sélectionnez une entité météo valide."
+    },
+    "abort": {
+      "already_configured": "Cette entité météo est déjà configurée."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Options de Laundry Advisor",
+        "description": "Mettez à jour l'entité météo, l'horizon de prévision ou l'intervalle de mise à jour.",
+        "data": {
+          "weather_entity": "Entité météo",
+          "forecast_hours": "Horizon de prévision",
+          "update_interval": "Intervalle de mise à jour"
+        },
+        "data_description": {
+          "weather_entity": "Entité météo fournissant des prévisions horaires ou quotidiennes.",
+          "forecast_hours": "Nombre d'heures de prévision à analyser (3 à 48 heures).",
+          "update_interval": "Fréquence de recalcul des recommandations de lessive (5 à 240 minutes)."
+        }
+      }
+    },
+    "error": {
+      "invalid_weather_entity": "Sélectionnez une entité météo valide."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "laundry_index": {
+        "name": "Indice de lessive"
+      },
+      "laundry_status": {
+        "name": "État de la lessive",
+        "state": {
+          "excellent": "Excellent",
+          "good": "Bon",
+          "fair": "Moyen",
+          "poor": "Mauvais"
+        }
+      },
+      "laundry_recommendation": {
+        "name": "Recommandation de lessive"
+      },
+      "laundry_drying_window": {
+        "name": "Fenêtre de séchage"
+      }
+    },
+    "binary_sensor": {
+      "laundry_good_day": {
+        "name": "Bonne journée pour la lessive"
+      }
+    }
+  }
+}

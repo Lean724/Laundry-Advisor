@@ -19,13 +19,16 @@ from .const import (
     CONF_UPDATE_INTERVAL,
     CONF_WEATHER_ENTITY,
     DEFAULT_FORECAST_HOURS,
+    DEFAULT_LANGUAGE,
     DEFAULT_UPDATE_INTERVAL,
     DOMAIN,
-    DRYING_WINDOW_NONE,
-    STATUS_EXCELLENT,
-    STATUS_FAIR,
-    STATUS_GOOD,
-    STATUS_POOR,
+)
+from .localization import (
+    ALL_STATUS_EXCELLENT,
+    ALL_STATUS_FAIR,
+    ALL_STATUS_GOOD,
+    get_localized_strings,
+    is_no_drying_window,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -120,19 +123,22 @@ class LaundryAdvisorCoordinator(DataUpdateCoordinator[LaundryAdvisorData]):
 
     async def _async_update_data(self) -> LaundryAdvisorData:
         """Fetch the latest forecast and calculate laundry advice."""
+        forecast: list[LaundryForecastPoint] = []
         try:
+            forecast = await self._async_get_hourly_forecast()
+        except Exception as err:  # noqa: BLE001
+            _LOGGER.debug(
+                "Hourly forecast unavailable for %s: %s",
+                self.weather_entity,
+                err,
+            )
+
+        if not forecast:
             try:
-                forecast = await self._async_get_hourly_forecast()
-            except Exception as err:  # noqa: BLE001
-                _LOGGER.debug(
-                    "Hourly forecast unavailable for %s: %s",
-                    self.weather_entity,
-                    err,
-                )
                 forecast = await self._async_get_daily_forecast_as_points()
-        except Exception as err:
-            msg = f"Unable to fetch weather forecast: {err}"
-            raise UpdateFailed(msg) from err
+            except Exception as err:
+                msg = f"Unable to fetch weather forecast: {err}"
+                raise UpdateFailed(msg) from err
 
         if not forecast:
             raise UpdateFailed("Weather entity did not return forecast data")
@@ -140,19 +146,21 @@ class LaundryAdvisorCoordinator(DataUpdateCoordinator[LaundryAdvisorData]):
         horizon = self.forecast_hours
         primary_forecast = tuple(forecast[:horizon])
         tomorrow_forecast = _tomorrow_forecast(forecast)
+        language = getattr(self.hass.config, "language", DEFAULT_LANGUAGE)
 
         index = calculate_laundry_index(primary_forecast)
         tomorrow_index = (
             calculate_laundry_index(tomorrow_forecast) if tomorrow_forecast else None
         )
-        drying_window = calculate_drying_window(primary_forecast)
-        status = status_from_index(index)
+        drying_window = calculate_drying_window(primary_forecast, language=language)
+        status = status_from_index(index, language=language)
         recommendation = build_recommendation(
             index=index,
             status=status,
             forecast=primary_forecast,
             drying_window=drying_window,
             tomorrow_index=tomorrow_index,
+            language=language,
         )
 
         return LaundryAdvisorData(
@@ -160,7 +168,7 @@ class LaundryAdvisorCoordinator(DataUpdateCoordinator[LaundryAdvisorData]):
             status=status,
             recommendation=recommendation,
             drying_window=drying_window,
-            good_day=index >= 60 and drying_window != DRYING_WINDOW_NONE,
+            good_day=index >= 60 and not is_no_drying_window(drying_window),
             weather_entity=self.weather_entity,
             forecast_hours=horizon,
             forecast=primary_forecast,
@@ -233,18 +241,22 @@ def _normalize_forecast_point(forecast: Forecast) -> LaundryForecastPoint:
     if point_datetime is None:
         point_datetime = dt_util.utcnow()
 
+    raw_temp = forecast_dict.get("native_temperature")
+    if raw_temp is None:
+        raw_temp = forecast_dict.get("temperature")
+
+    raw_wind = forecast_dict.get("native_wind_speed")
+    if raw_wind is None:
+        raw_wind = forecast_dict.get("wind_speed")
+
     return LaundryForecastPoint(
         datetime=dt_util.as_local(point_datetime),
-        temperature=_as_float(
-            forecast_dict.get("native_temperature") or forecast_dict.get("temperature")
-        ),
+        temperature=_as_float(raw_temp),
         humidity=_as_float(forecast_dict.get("humidity")),
         precipitation_probability=_as_float(
             forecast_dict.get("precipitation_probability")
         ),
-        wind_speed=_as_float(
-            forecast_dict.get("native_wind_speed") or forecast_dict.get("wind_speed")
-        ),
+        wind_speed=_as_float(raw_wind),
         condition=(
             str(forecast_dict["condition"]) if forecast_dict.get("condition") else None
         ),
@@ -268,7 +280,10 @@ def calculate_laundry_index(forecast: Sequence[LaundryForecastPoint]) -> int:
     return round(max(0.0, min(score, 100.0)))
 
 
-def calculate_drying_window(forecast: Sequence[LaundryForecastPoint]) -> str:
+def calculate_drying_window(
+    forecast: Sequence[LaundryForecastPoint],
+    language: str = DEFAULT_LANGUAGE,
+) -> str:
     """Find the longest continuous suitable drying window."""
     best_start: datetime | None = None
     best_end: datetime | None = None
@@ -292,20 +307,24 @@ def calculate_drying_window(forecast: Sequence[LaundryForecastPoint]) -> str:
             current_end = None
 
     if best_start is None or best_end is None:
-        return DRYING_WINDOW_NONE
+        return get_localized_strings(language).drying_window_none
 
     return f"{best_start:%H:%M}-{best_end:%H:%M}"
 
 
-def status_from_index(index: int) -> str:
-    """Map an index to the public status string."""
+def status_from_index(
+    index: int,
+    language: str = DEFAULT_LANGUAGE,
+) -> str:
+    """Map an index to the localized status string."""
+    strings = get_localized_strings(language)
     if index >= 80:
-        return STATUS_EXCELLENT
+        return strings.status_excellent
     if index >= 60:
-        return STATUS_GOOD
+        return strings.status_good
     if index >= 40:
-        return STATUS_FAIR
-    return STATUS_POOR
+        return strings.status_fair
+    return strings.status_poor
 
 
 def _tomorrow_forecast(
@@ -316,56 +335,60 @@ def _tomorrow_forecast(
     return tuple(point for point in forecast if point.datetime.date() == tomorrow)
 
 
-def build_recommendation(
+def build_recommendation(  # noqa: PLR0913
     *,
     index: int,
     status: str,
     forecast: Sequence[LaundryForecastPoint],
     drying_window: str,
     tomorrow_index: int | None,
+    language: str = DEFAULT_LANGUAGE,
 ) -> str:
-    """Build a short human-readable recommendation."""
+    """Build a short human-readable recommendation in the requested language."""
+    strings = get_localized_strings(language)
     rain_after = _first_rain_time(forecast)
 
-    if status == STATUS_EXCELLENT:
-        recommendation = "Excellent drying conditions today."
-    elif status == STATUS_GOOD:
-        recommendation = "Good drying conditions expected."
-    elif status == STATUS_FAIR:
-        recommendation = "Drying conditions are fair. Use the best available window."
+    if status in ALL_STATUS_EXCELLENT:
+        recommendation = strings.rec_excellent
+    elif status in ALL_STATUS_GOOD:
+        recommendation = strings.rec_good
+    elif status in ALL_STATUS_FAIR:
+        recommendation = strings.rec_fair
     else:
-        recommendation = "Drying conditions are poor. Consider postponing laundry."
+        recommendation = strings.rec_poor
 
     if rain_after is not None and index >= 50:
-        recommendation = (
-            f"Good day for laundry, but rain is expected after {rain_after:%H:%M}."
+        recommendation = strings.rec_rain_after.format(
+            time=f"{rain_after:%H:%M}",
         )
-    elif drying_window == DRYING_WINDOW_NONE:
-        recommendation = "No suitable outdoor drying window is expected."
+    elif is_no_drying_window(drying_window):
+        recommendation = strings.rec_no_window
 
     if (
         tomorrow_index is not None
         and tomorrow_index - index >= SIGNIFICANTLY_BETTER_DELTA
     ):
-        recommendation = (
-            f"{recommendation} Tomorrow offers substantially better drying conditions."
-        )
+        separator = "" if recommendation.endswith("。") else " "
+        recommendation = f"{recommendation}{separator}{strings.rec_tomorrow_better}"
 
     return recommendation
 
 
 def _is_suitable_hour(point: LaundryForecastPoint) -> bool:
     """Return whether a forecast point is suitable for outdoor drying."""
+    temp = point.temperature if point.temperature is not None else -999.0
+    humidity = point.humidity if point.humidity is not None else 100.0
+    precip = (
+        point.precipitation_probability
+        if point.precipitation_probability is not None
+        else 100.0
+    )
+    wind = point.wind_speed if point.wind_speed is not None else 0.0
     return (
-        (point.temperature or -999.0) >= 15.0
-        and (point.humidity if point.humidity is not None else 100.0) <= 75.0
-        and (
-            point.precipitation_probability
-            if point.precipitation_probability is not None
-            else 100.0
-        )
-        <= 20.0
-        and (point.wind_speed or 0.0) >= 5.0
+        temp >= 15.0
+        and humidity <= 75.0
+        and precip <= 20.0
+        and wind >= 5.0
         and not _condition_is_rainy(point.condition)
     )
 

@@ -129,6 +129,19 @@ The Config Flow lets you select:
 The selected weather entity must expose Home Assistant forecast support. Hourly
 forecasts are preferred; daily forecasts are used as a fallback.
 
+## Supported Languages
+
+Both configuration/options flows, entity names, and sensor responses (`laundry_status`, `laundry_recommendation`, and `laundry_drying_window`) are localized in:
+
+- English (`en`)
+- Spanish (`es`)
+- Italian (`it`)
+- Portuguese (`pt`, `pt-BR`)
+- Russian (`ru`)
+- German (`de`)
+- French (`fr`)
+- Simplified Chinese (`zh-Hans`)
+
 ## Diagnostics
 
 Diagnostics expose non-sensitive integration state:

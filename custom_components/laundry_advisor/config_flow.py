@@ -28,11 +28,14 @@ from .const import (
 def _schema(defaults: Mapping[str, Any] | None = None) -> vol.Schema:
     """Build the config/options schema."""
     defaults = defaults or {}
+    weather_default = defaults.get(CONF_WEATHER_ENTITY)
     return vol.Schema(
         {
             vol.Required(
                 CONF_WEATHER_ENTITY,
-                default=defaults.get(CONF_WEATHER_ENTITY),
+                default=(
+                    weather_default if weather_default is not None else vol.UNDEFINED
+                ),
             ): selector.EntitySelector(
                 selector.EntitySelectorConfig(domain=Platform.WEATHER)
             ),
@@ -45,6 +48,7 @@ def _schema(defaults: Mapping[str, Any] | None = None) -> vol.Schema:
                     max=MAX_FORECAST_HOURS,
                     step=1,
                     mode=selector.NumberSelectorMode.BOX,
+                    unit_of_measurement="h",
                 )
             ),
             vol.Required(
@@ -80,13 +84,12 @@ class LaundryAdvisorConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # typ
 
         if user_input is not None:
             weather_entity = user_input[CONF_WEATHER_ENTITY]
-            await self.async_set_unique_id(weather_entity)
-            self._abort_if_unique_id_configured()
-
             state = self.hass.states.get(weather_entity)
             if state is None or not weather_entity.startswith(f"{Platform.WEATHER}."):
                 errors["base"] = "invalid_weather_entity"
             else:
+                await self.async_set_unique_id(weather_entity)
+                self._abort_if_unique_id_configured()
                 return self.async_create_entry(
                     title=state.name or weather_entity,
                     data=user_input,
@@ -110,7 +113,10 @@ class LaundryAdvisorConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # typ
 class LaundryAdvisorOptionsFlow(config_entries.OptionsFlow):
     """Handle Laundry Advisor options."""
 
-    def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
+    def __init__(
+        self,
+        config_entry: config_entries.ConfigEntry | None = None,
+    ) -> None:
         """Initialize the options flow."""
         self._config_entry = config_entry
 
@@ -119,11 +125,20 @@ class LaundryAdvisorOptionsFlow(config_entries.OptionsFlow):
         user_input: dict[str, Any] | None = None,
     ) -> config_entries.ConfigFlowResult:
         """Manage integration options."""
-        if user_input is not None:
-            return self.async_create_entry(title="", data=user_input)
+        errors: dict[str, str] = {}
 
-        defaults = {**self._config_entry.data, **self._config_entry.options}
+        if user_input is not None:
+            weather_entity = user_input[CONF_WEATHER_ENTITY]
+            state = self.hass.states.get(weather_entity)
+            if state is None or not weather_entity.startswith(f"{Platform.WEATHER}."):
+                errors["base"] = "invalid_weather_entity"
+            else:
+                return self.async_create_entry(title="", data=user_input)
+
+        entry = self._config_entry or self.config_entry
+        defaults = {**entry.data, **entry.options}
         return self.async_show_form(
             step_id="init",
-            data_schema=_schema(defaults),
+            data_schema=_schema(user_input or defaults),
+            errors=errors,
         )
