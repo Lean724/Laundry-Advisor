@@ -62,6 +62,7 @@ Laundry Advisor creates these entities:
 | `sensor.laundry_status` | Sensor | `Excellent` |
 | `sensor.laundry_recommendation` | Sensor | `Excellent drying conditions today.` |
 | `sensor.laundry_drying_window` | Sensor | `09:00-17:00` |
+| `sensor.laundry_estimated_drying_time` | Sensor | `2.8 h` |
 | `binary_sensor.laundry_good_day` | Binary sensor | `on` |
 
 Status bands:

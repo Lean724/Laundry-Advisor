@@ -3,16 +3,24 @@
     "step": {
       "user": {
         "title": "Laundry Advisor",
-        "description": "Choisissez l'entité météo utilisée pour calculer les conditions de séchage du linge en extérieur.",
+        "description": "Choisissez l'entité météo, le type de linge et les capteurs extérieurs locaux optionnels pour calculer les conditions de séchage.",
         "data": {
           "weather_entity": "Entité météo",
           "forecast_hours": "Horizon de prévision",
-          "update_interval": "Intervalle de mise à jour"
+          "update_interval": "Intervalle de mise à jour",
+          "load_type": "Type de charge de linge",
+          "temperature_sensor": "Capteur local de température extérieure (optionnel)",
+          "humidity_sensor": "Capteur local d'humidité extérieure (optionnel)",
+          "wind_speed_sensor": "Capteur local de vitesse du vent (optionnel)"
         },
         "data_description": {
           "weather_entity": "Entité météo fournissant des prévisions horaires ou quotidiennes.",
           "forecast_hours": "Nombre d'heures de prévision à analyser (3 à 48 heures).",
-          "update_interval": "Fréquence de recalcul des recommandations de lessive (5 à 240 minutes)."
+          "update_interval": "Fréquence de recalcul des recommandations de lessive (5 à 240 minutes).",
+          "load_type": "Épaisseur du textile utilisée pour estimer la durée de séchage.",
+          "temperature_sensor": "Capteur de température extérieure en temps réel pour affiner l'heure actuelle.",
+          "humidity_sensor": "Capteur d'humidité extérieure en temps réel pour affiner l'heure actuelle.",
+          "wind_speed_sensor": "Capteur de vitesse du vent extérieur en temps réel pour affiner l'heure actuelle."
         }
       }
     },
@@ -27,21 +35,38 @@
     "step": {
       "init": {
         "title": "Options de Laundry Advisor",
-        "description": "Mettez à jour l'entité météo, l'horizon de prévision ou l'intervalle de mise à jour.",
+        "description": "Mettez à jour l'entité météo, l'horizon de prévision, le type de linge ou les capteurs extérieurs locaux.",
         "data": {
           "weather_entity": "Entité météo",
           "forecast_hours": "Horizon de prévision",
-          "update_interval": "Intervalle de mise à jour"
+          "update_interval": "Intervalle de mise à jour",
+          "load_type": "Type de charge de linge",
+          "temperature_sensor": "Capteur local de température extérieure (optionnel)",
+          "humidity_sensor": "Capteur local d'humidité extérieure (optionnel)",
+          "wind_speed_sensor": "Capteur local de vitesse du vent (optionnel)"
         },
         "data_description": {
           "weather_entity": "Entité météo fournissant des prévisions horaires ou quotidiennes.",
           "forecast_hours": "Nombre d'heures de prévision à analyser (3 à 48 heures).",
-          "update_interval": "Fréquence de recalcul des recommandations de lessive (5 à 240 minutes)."
+          "update_interval": "Fréquence de recalcul des recommandations de lessive (5 à 240 minutes).",
+          "load_type": "Épaisseur du textile utilisée pour estimer la durée de séchage.",
+          "temperature_sensor": "Capteur de température extérieure en temps réel pour affiner l'heure actuelle.",
+          "humidity_sensor": "Capteur d'humidité extérieure en temps réel pour affiner l'heure actuelle.",
+          "wind_speed_sensor": "Capteur de vitesse du vent extérieur en temps réel pour affiner l'heure actuelle."
         }
       }
     },
     "error": {
       "invalid_weather_entity": "Sélectionnez une entité météo valide."
+    }
+  },
+  "selector": {
+    "load_type": {
+      "options": {
+        "light": "Linge léger / Synthétiques",
+        "standard": "Standard / Coton",
+        "heavy": "Linge épais / Serviettes et jeans"
+      }
     }
   },
   "entity": {
@@ -63,6 +88,9 @@
       },
       "laundry_drying_window": {
         "name": "Fenêtre de séchage"
+      },
+      "laundry_estimated_drying_time": {
+        "name": "Temps de séchage estimé"
       }
     },
     "binary_sensor": {

@@ -3,16 +3,24 @@
     "step": {
       "user": {
         "title": "Laundry Advisor",
-        "description": "Escolha a entidade meteorológica utilizada para calcular as condições de secagem de roupa ao ar livre.",
+        "description": "Escolha a entidade meteorológica, o tipo de carga e os sensores exteriores locais opcionais para calcular as condições de secagem.",
         "data": {
           "weather_entity": "Entidade meteorológica",
           "forecast_hours": "Horizonte de previsão",
-          "update_interval": "Intervalo de atualização"
+          "update_interval": "Intervalo de atualização",
+          "load_type": "Tipo de carga de roupa",
+          "temperature_sensor": "Sensor local de temperatura exterior (opcional)",
+          "humidity_sensor": "Sensor local de humidade exterior (opcional)",
+          "wind_speed_sensor": "Sensor local de velocidade do vento (opcional)"
         },
         "data_description": {
           "weather_entity": "Entidade meteorológica que fornece dados de previsão horária ou diária.",
           "forecast_hours": "Número de horas de previsão a analisar (3-48 horas).",
-          "update_interval": "Frequência de recálculo da recomendação de lavagem (5-240 minutos)."
+          "update_interval": "Frequência de recálculo da recomendação de lavagem (5-240 minutos).",
+          "load_type": "Tipo de tecido utilizado para estimar o tempo de secagem.",
+          "temperature_sensor": "Sensor de temperatura exterior em tempo real para ajustar a hora atual.",
+          "humidity_sensor": "Sensor de humidade exterior em tempo real para ajustar a hora atual.",
+          "wind_speed_sensor": "Sensor de velocidade do vento exterior em tempo real para ajustar a hora atual."
         }
       }
     },
@@ -27,21 +35,38 @@
     "step": {
       "init": {
         "title": "Opções do Laundry Advisor",
-        "description": "Atualize a entidade meteorológica, o horizonte de previsão ou o intervalo de atualização.",
+        "description": "Atualize a entidade meteorológica, o horizonte de previsão, o tipo de carga ou os sensores exteriores locais.",
         "data": {
           "weather_entity": "Entidade meteorológica",
           "forecast_hours": "Horizonte de previsão",
-          "update_interval": "Intervalo de atualização"
+          "update_interval": "Intervalo de atualização",
+          "load_type": "Tipo de carga de roupa",
+          "temperature_sensor": "Sensor local de temperatura exterior (opcional)",
+          "humidity_sensor": "Sensor local de humidade exterior (opcional)",
+          "wind_speed_sensor": "Sensor local de velocidade do vento (opcional)"
         },
         "data_description": {
           "weather_entity": "Entidade meteorológica que fornece dados de previsão horária ou diária.",
           "forecast_hours": "Número de horas de previsão a analisar (3-48 horas).",
-          "update_interval": "Frequência de recálculo da recomendação de lavagem (5-240 minutos)."
+          "update_interval": "Frequência de recálculo da recomendação de lavagem (5-240 minutos).",
+          "load_type": "Tipo de tecido utilizado para estimar o tempo de secagem.",
+          "temperature_sensor": "Sensor de temperatura exterior em tempo real para ajustar a hora atual.",
+          "humidity_sensor": "Sensor de humidade exterior em tempo real para ajustar a hora atual.",
+          "wind_speed_sensor": "Sensor de velocidade do vento exterior em tempo real para ajustar a hora atual."
         }
       }
     },
     "error": {
       "invalid_weather_entity": "Selecione uma entidade meteorológica válida."
+    }
+  },
+  "selector": {
+    "load_type": {
+      "options": {
+        "light": "Roupa leve / Sintéticos",
+        "standard": "Padrão / Algodão",
+        "heavy": "Roupa pesada / Toalhas e calças de ganga"
+      }
     }
   },
   "entity": {
@@ -63,6 +88,9 @@
       },
       "laundry_drying_window": {
         "name": "Janela de secagem"
+      },
+      "laundry_estimated_drying_time": {
+        "name": "Tempo estimado de secagem"
       }
     },
     "binary_sensor": {

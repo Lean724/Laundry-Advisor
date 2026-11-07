@@ -3,16 +3,24 @@
     "step": {
       "user": {
         "title": "Laundry Advisor",
-        "description": "Wählen Sie die Wetter-Entität aus, die zur Berechnung der Bedingungen für das Wäschetrocknen im Freien verwendet wird.",
+        "description": "Wählen Sie die Wetter-Entität, die Beladungsart und optionale lokale Außensensoren zur Berechnung der Trocknungsbedingungen aus.",
         "data": {
           "weather_entity": "Wetter-Entität",
           "forecast_hours": "Vorhersagehorizont",
-          "update_interval": "Aktualisierungsintervall"
+          "update_interval": "Aktualisierungsintervall",
+          "load_type": "Wäscheart / Beladung",
+          "temperature_sensor": "Lokaler Außentemperatursensor (optional)",
+          "humidity_sensor": "Lokaler Außenluftfeuchtigkeitssensor (optional)",
+          "wind_speed_sensor": "Lokaler Windgeschwindigkeitssensor (optional)"
         },
         "data_description": {
           "weather_entity": "Wetter-Entität, die stündliche oder tägliche Vorhersagedaten bereitstellt.",
           "forecast_hours": "Anzahl der zu analysierenden Vorhersagestunden (3–48 Stunden).",
-          "update_interval": "Wie oft die Waschempfehlung neu berechnet werden soll (5–240 Minuten)."
+          "update_interval": "Wie oft die Waschempfehlung neu berechnet werden soll (5–240 Minuten).",
+          "load_type": "Gewebeart zur Schätzung der Trocknungsdauer.",
+          "temperature_sensor": "Optionaler Echtzeit-Außentemperatursensor zur Verfeinerung der aktuellen Stunde.",
+          "humidity_sensor": "Optionaler Echtzeit-Außenluftfeuchtigkeitssensor zur Verfeinerung der aktuellen Stunde.",
+          "wind_speed_sensor": "Optionaler Echtzeit-Windgeschwindigkeitssensor zur Verfeinerung der aktuellen Stunde."
         }
       }
     },
@@ -27,21 +35,38 @@
     "step": {
       "init": {
         "title": "Laundry Advisor Optionen",
-        "description": "Aktualisieren Sie die Wetter-Entität, den Vorhersagehorizont oder das Aktualisierungsintervall.",
+        "description": "Aktualisieren Sie die Wetter-Entität, den Vorhersagehorizont, die Wäscheart oder lokale Außensensoren.",
         "data": {
           "weather_entity": "Wetter-Entität",
           "forecast_hours": "Vorhersagehorizont",
-          "update_interval": "Aktualisierungsintervall"
+          "update_interval": "Aktualisierungsintervall",
+          "load_type": "Wäscheart / Beladung",
+          "temperature_sensor": "Lokaler Außentemperatursensor (optional)",
+          "humidity_sensor": "Lokaler Außenluftfeuchtigkeitssensor (optional)",
+          "wind_speed_sensor": "Lokaler Windgeschwindigkeitssensor (optional)"
         },
         "data_description": {
           "weather_entity": "Wetter-Entität, die stündliche oder tägliche Vorhersagedaten bereitstellt.",
           "forecast_hours": "Anzahl der zu analysierenden Vorhersagestunden (3–48 Stunden).",
-          "update_interval": "Wie oft die Waschempfehlung neu berechnet werden soll (5–240 Minuten)."
+          "update_interval": "Wie oft die Waschempfehlung neu berechnet werden soll (5–240 Minuten).",
+          "load_type": "Gewebeart zur Schätzung der Trocknungsdauer.",
+          "temperature_sensor": "Optionaler Echtzeit-Außentemperatursensor zur Verfeinerung der aktuellen Stunde.",
+          "humidity_sensor": "Optionaler Echtzeit-Außenluftfeuchtigkeitssensor zur Verfeinerung der aktuellen Stunde.",
+          "wind_speed_sensor": "Optionaler Echtzeit-Windgeschwindigkeitssensor zur Verfeinerung der aktuellen Stunde."
         }
       }
     },
     "error": {
       "invalid_weather_entity": "Bitte wählen Sie eine gültige Wetter-Entität aus."
+    }
+  },
+  "selector": {
+    "load_type": {
+      "options": {
+        "light": "Leicht / Synthetik",
+        "standard": "Standard / Baumwolle",
+        "heavy": "Schwer / Handtücher & Jeans"
+      }
     }
   },
   "entity": {
@@ -63,6 +88,9 @@
       },
       "laundry_drying_window": {
         "name": "Trocknungsfenster"
+      },
+      "laundry_estimated_drying_time": {
+        "name": "Geschätzte Trocknungszeit"
       }
     },
     "binary_sensor": {

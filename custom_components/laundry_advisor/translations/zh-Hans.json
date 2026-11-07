@@ -3,16 +3,24 @@
     "step": {
       "user": {
         "title": "Laundry Advisor",
-        "description": "选择用于计算户外衣物晾晒条件的气象实体。",
+        "description": "选择气象实体、衣物类型以及可选的本地室外传感器以计算晾晒条件。",
         "data": {
           "weather_entity": "气象实体",
           "forecast_hours": "预报时长",
-          "update_interval": "更新间隔"
+          "update_interval": "更新间隔",
+          "load_type": "衣物类型",
+          "temperature_sensor": "本地室外温度传感器（可选）",
+          "humidity_sensor": "本地室外湿度传感器（可选）",
+          "wind_speed_sensor": "本地室外风速传感器（可选）"
         },
         "data_description": {
           "weather_entity": "提供每小时或每日天气预报数据的气象实体。",
           "forecast_hours": "要分析的预报小时数（3-48 小时）。",
-          "update_interval": "重新计算洗衣晾晒建议的频率（5-240 分钟）。"
+          "update_interval": "重新计算洗衣晾晒建议的频率（5-240 分钟）。",
+          "load_type": "用于估算晾干时间的衣物厚度类型。",
+          "temperature_sensor": "可选的实时室外温度传感器，用于校准当前小时数据。",
+          "humidity_sensor": "可选的实时室外湿度传感器，用于校准当前小时数据。",
+          "wind_speed_sensor": "可选的实时室外风速传感器，用于校准当前小时数据。"
         }
       }
     },
@@ -27,21 +35,38 @@
     "step": {
       "init": {
         "title": "Laundry Advisor 选项",
-        "description": "更新气象实体、预报时长或更新间隔。",
+        "description": "更新气象实体、预报时长、衣物类型或本地室外传感器。",
         "data": {
           "weather_entity": "气象实体",
           "forecast_hours": "预报时长",
-          "update_interval": "更新间隔"
+          "update_interval": "更新间隔",
+          "load_type": "衣物类型",
+          "temperature_sensor": "本地室外温度传感器（可选）",
+          "humidity_sensor": "本地室外湿度传感器（可选）",
+          "wind_speed_sensor": "本地室外风速传感器（可选）"
         },
         "data_description": {
           "weather_entity": "提供每小时或每日天气预报数据的气象实体。",
           "forecast_hours": "要分析的预报小时数（3-48 小时）。",
-          "update_interval": "重新计算洗衣晾晒建议的频率（5-240 分钟）。"
+          "update_interval": "重新计算洗衣晾晒建议的频率（5-240 分钟）。",
+          "load_type": "用于估算晾干时间的衣物厚度类型。",
+          "temperature_sensor": "可选的实时室外温度传感器，用于校准当前小时数据。",
+          "humidity_sensor": "可选的实时室外湿度传感器，用于校准当前小时数据。",
+          "wind_speed_sensor": "可选的实时室外风速传感器，用于校准当前小时数据。"
         }
       }
     },
     "error": {
       "invalid_weather_entity": "请选择有效的气象实体。"
+    }
+  },
+  "selector": {
+    "load_type": {
+      "options": {
+        "light": "轻薄衣物 / 化纤",
+        "standard": "标准衣物 / 纯棉",
+        "heavy": "厚重衣物 / 毛巾与牛仔裤"
+      }
     }
   },
   "entity": {
@@ -63,6 +88,9 @@
       },
       "laundry_drying_window": {
         "name": "最佳晾晒时段"
+      },
+      "laundry_estimated_drying_time": {
+        "name": "预计晾干时间"
       }
     },
     "binary_sensor": {

@@ -3,16 +3,24 @@
     "step": {
       "user": {
         "title": "Laundry Advisor",
-        "description": "Elegí la entidad meteorológica que se usará para calcular las condiciones de secado al aire libre.",
+        "description": "Elegí la entidad meteorológica, el tipo de carga y los sensores exteriores locales opcionales para calcular las condiciones de secado.",
         "data": {
           "weather_entity": "Entidad meteorológica",
           "forecast_hours": "Horizonte del pronóstico",
-          "update_interval": "Intervalo de actualización"
+          "update_interval": "Intervalo de actualización",
+          "load_type": "Tipo de carga de ropa",
+          "temperature_sensor": "Sensor local de temperatura exterior (opcional)",
+          "humidity_sensor": "Sensor local de humedad exterior (opcional)",
+          "wind_speed_sensor": "Sensor local de velocidad del viento (opcional)"
         },
         "data_description": {
           "weather_entity": "Entidad meteorológica que proporciona datos de pronóstico por hora o diario.",
           "forecast_hours": "Cantidad de horas de pronóstico a analizar (3-48 horas).",
-          "update_interval": "Frecuencia con la que se recalcula la recomendación de lavado (5-240 minutos)."
+          "update_interval": "Frecuencia con la que se recalcula la recomendación de lavado (5-240 minutos).",
+          "load_type": "Tipo de prenda/carga usado para estimar el tiempo real de secado.",
+          "temperature_sensor": "Sensor de temperatura exterior en tiempo real para ajustar la hora actual.",
+          "humidity_sensor": "Sensor de humedad exterior en tiempo real para ajustar la hora actual.",
+          "wind_speed_sensor": "Sensor de viento exterior en tiempo real para ajustar la hora actual."
         }
       }
     },
@@ -27,21 +35,38 @@
     "step": {
       "init": {
         "title": "Opciones de Laundry Advisor",
-        "description": "Actualizá la entidad meteorológica, el horizonte del pronóstico o el intervalo de actualización.",
+        "description": "Actualizá la entidad meteorológica, el horizonte del pronóstico, el tipo de carga o los sensores exteriores locales.",
         "data": {
           "weather_entity": "Entidad meteorológica",
           "forecast_hours": "Horizonte del pronóstico",
-          "update_interval": "Intervalo de actualización"
+          "update_interval": "Intervalo de actualización",
+          "load_type": "Tipo de carga de ropa",
+          "temperature_sensor": "Sensor local de temperatura exterior (opcional)",
+          "humidity_sensor": "Sensor local de humedad exterior (opcional)",
+          "wind_speed_sensor": "Sensor local de velocidad del viento (opcional)"
         },
         "data_description": {
           "weather_entity": "Entidad meteorológica que proporciona datos de pronóstico por hora o diario.",
           "forecast_hours": "Cantidad de horas de pronóstico a analizar (3-48 horas).",
-          "update_interval": "Frecuencia con la que se recalcula la recomendación de lavado (5-240 minutos)."
+          "update_interval": "Frecuencia con la que se recalcula la recomendación de lavado (5-240 minutos).",
+          "load_type": "Tipo de prenda/carga usado para estimar el tiempo real de secado.",
+          "temperature_sensor": "Sensor de temperatura exterior en tiempo real para ajustar la hora actual.",
+          "humidity_sensor": "Sensor de humedad exterior en tiempo real para ajustar la hora actual.",
+          "wind_speed_sensor": "Sensor de viento exterior en tiempo real para ajustar la hora actual."
         }
       }
     },
     "error": {
       "invalid_weather_entity": "Seleccioná una entidad meteorológica válida."
+    }
+  },
+  "selector": {
+    "load_type": {
+      "options": {
+        "light": "Ropa liviana / Sintéticos",
+        "standard": "Estándar / Algodón",
+        "heavy": "Ropa pesada / Toallas y jeans"
+      }
     }
   },
   "entity": {
@@ -63,6 +88,9 @@
       },
       "laundry_drying_window": {
         "name": "Ventana de secado"
+      },
+      "laundry_estimated_drying_time": {
+        "name": "Tiempo estimado de secado"
       }
     },
     "binary_sensor": {

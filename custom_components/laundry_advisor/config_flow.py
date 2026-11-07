@@ -7,22 +7,40 @@ from typing import Any
 
 import voluptuous as vol
 from homeassistant import config_entries
+from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import Platform
 from homeassistant.core import callback
 from homeassistant.helpers import selector
 
 from .const import (
     CONF_FORECAST_HOURS,
+    CONF_HUMIDITY_SENSOR,
+    CONF_LOAD_TYPE,
+    CONF_TEMP_SENSOR,
     CONF_UPDATE_INTERVAL,
     CONF_WEATHER_ENTITY,
+    CONF_WIND_SENSOR,
     DEFAULT_FORECAST_HOURS,
+    DEFAULT_LOAD_TYPE,
     DEFAULT_UPDATE_INTERVAL_MINUTES,
     DOMAIN,
+    LOAD_TYPES,
     MAX_FORECAST_HOURS,
     MAX_UPDATE_INTERVAL_MINUTES,
     MIN_FORECAST_HOURS,
     MIN_UPDATE_INTERVAL_MINUTES,
 )
+
+
+def _optional_entity_field(
+    key: str,
+    defaults: Mapping[str, Any],
+) -> vol.Optional:
+    """Create an optional Voluptuous key with suggested_value when present."""
+    current = defaults.get(key)
+    if current:
+        return vol.Optional(key, description={"suggested_value": current})
+    return vol.Optional(key)
 
 
 def _schema(defaults: Mapping[str, Any] | None = None) -> vol.Schema:
@@ -64,6 +82,42 @@ def _schema(defaults: Mapping[str, Any] | None = None) -> vol.Schema:
                     step=5,
                     mode=selector.NumberSelectorMode.BOX,
                     unit_of_measurement="min",
+                )
+            ),
+            vol.Required(
+                CONF_LOAD_TYPE,
+                default=defaults.get(CONF_LOAD_TYPE, DEFAULT_LOAD_TYPE),
+            ): selector.SelectSelector(
+                selector.SelectSelectorConfig(
+                    options=list(LOAD_TYPES),
+                    translation_key=CONF_LOAD_TYPE,
+                    mode=selector.SelectSelectorMode.DROPDOWN,
+                )
+            ),
+            _optional_entity_field(
+                CONF_TEMP_SENSOR,
+                defaults,
+            ): selector.EntitySelector(
+                selector.EntitySelectorConfig(
+                    domain=Platform.SENSOR,
+                    device_class=SensorDeviceClass.TEMPERATURE,
+                )
+            ),
+            _optional_entity_field(
+                CONF_HUMIDITY_SENSOR,
+                defaults,
+            ): selector.EntitySelector(
+                selector.EntitySelectorConfig(
+                    domain=Platform.SENSOR,
+                    device_class=SensorDeviceClass.HUMIDITY,
+                )
+            ),
+            _optional_entity_field(
+                CONF_WIND_SENSOR,
+                defaults,
+            ): selector.EntitySelector(
+                selector.EntitySelectorConfig(
+                    domain=Platform.SENSOR,
                 )
             ),
         }

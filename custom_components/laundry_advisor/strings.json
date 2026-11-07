@@ -3,16 +3,24 @@
     "step": {
       "user": {
         "title": "Laundry Advisor",
-        "description": "Choose the weather entity used to calculate outdoor laundry drying conditions.",
+        "description": "Choose the weather entity, load type, and optional local outdoor sensors used to calculate drying conditions.",
         "data": {
           "weather_entity": "Weather entity",
           "forecast_hours": "Forecast horizon",
-          "update_interval": "Update interval"
+          "update_interval": "Update interval",
+          "load_type": "Laundry load type",
+          "temperature_sensor": "Local outdoor temperature sensor (optional)",
+          "humidity_sensor": "Local outdoor humidity sensor (optional)",
+          "wind_speed_sensor": "Local outdoor wind speed sensor (optional)"
         },
         "data_description": {
           "weather_entity": "Weather entity that provides hourly or daily forecast data.",
           "forecast_hours": "Number of forecast hours to analyze (3-48 hours).",
-          "update_interval": "How often to recalculate the laundry advice (5-240 minutes)."
+          "update_interval": "How often to recalculate the laundry advice (5-240 minutes).",
+          "load_type": "Fabric weight used to estimate drying duration.",
+          "temperature_sensor": "Optional real-time outdoor temperature sensor to refine the current hour.",
+          "humidity_sensor": "Optional real-time outdoor humidity sensor to refine the current hour.",
+          "wind_speed_sensor": "Optional real-time outdoor wind speed sensor to refine the current hour."
         }
       }
     },
@@ -27,21 +35,38 @@
     "step": {
       "init": {
         "title": "Laundry Advisor options",
-        "description": "Update the weather entity, forecast horizon, or update interval.",
+        "description": "Update the weather entity, forecast horizon, load type, or local outdoor sensors.",
         "data": {
           "weather_entity": "Weather entity",
           "forecast_hours": "Forecast horizon",
-          "update_interval": "Update interval"
+          "update_interval": "Update interval",
+          "load_type": "Laundry load type",
+          "temperature_sensor": "Local outdoor temperature sensor (optional)",
+          "humidity_sensor": "Local outdoor humidity sensor (optional)",
+          "wind_speed_sensor": "Local outdoor wind speed sensor (optional)"
         },
         "data_description": {
           "weather_entity": "Weather entity that provides hourly or daily forecast data.",
           "forecast_hours": "Number of forecast hours to analyze (3-48 hours).",
-          "update_interval": "How often to recalculate the laundry advice (5-240 minutes)."
+          "update_interval": "How often to recalculate the laundry advice (5-240 minutes).",
+          "load_type": "Fabric weight used to estimate drying duration.",
+          "temperature_sensor": "Optional real-time outdoor temperature sensor to refine the current hour.",
+          "humidity_sensor": "Optional real-time outdoor humidity sensor to refine the current hour.",
+          "wind_speed_sensor": "Optional real-time outdoor wind speed sensor to refine the current hour."
         }
       }
     },
     "error": {
       "invalid_weather_entity": "Select a valid weather entity."
+    }
+  },
+  "selector": {
+    "load_type": {
+      "options": {
+        "light": "Light / Synthetics",
+        "standard": "Standard / Cotton",
+        "heavy": "Heavy / Towels & Jeans"
+      }
     }
   },
   "entity": {
@@ -63,6 +88,9 @@
       },
       "laundry_drying_window": {
         "name": "Laundry drying window"
+      },
+      "laundry_estimated_drying_time": {
+        "name": "Estimated drying time"
       }
     },
     "binary_sensor": {

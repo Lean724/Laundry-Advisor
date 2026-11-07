@@ -9,6 +9,9 @@ from pathlib import Path
 
 from custom_components.laundry_advisor.const import (
     DRYING_WINDOW_NONE,
+    LOAD_TYPE_HEAVY,
+    LOAD_TYPE_LIGHT,
+    LOAD_TYPE_STANDARD,
     STATUS_EXCELLENT,
     STATUS_FAIR,
     STATUS_GOOD,
@@ -17,9 +20,13 @@ from custom_components.laundry_advisor.const import (
 )
 from custom_components.laundry_advisor.coordinator import (
     LaundryForecastPoint,
+    apply_local_overrides,
     build_recommendation,
     calculate_drying_window,
+    calculate_estimated_drying_time,
     calculate_laundry_index,
+    calculate_score_breakdown,
+    calculate_vpd_kpa,
     status_from_index,
 )
 from custom_components.laundry_advisor.localization import (
@@ -52,6 +59,7 @@ class TestLaundryAdvisorEngine(unittest.TestCase):
         """Test with empty forecast."""
         self.assertEqual(calculate_laundry_index(()), 0)
         self.assertEqual(calculate_drying_window(()), DRYING_WINDOW_NONE)
+        self.assertIsNone(calculate_estimated_drying_time(()))
 
     def test_ideal_conditions(self) -> None:
         """Test ideal drying conditions score near 100."""
@@ -176,6 +184,94 @@ class TestLaundryAdvisorEngine(unittest.TestCase):
             tomorrow_index=80,
         )
         self.assertIn("Tomorrow offers substantially better drying conditions.", rec)
+
+    def test_vpd_and_solar_physics(self) -> None:
+        """Test VPD calculation and solar/nighttime/dew-point adjustments."""
+        vpd_hot_dry = calculate_vpd_kpa(30.0, 35.0)
+        vpd_cool_humid = calculate_vpd_kpa(15.0, 85.0)
+        self.assertGreater(vpd_hot_dry, 2.0)
+        self.assertLess(vpd_cool_humid, 0.5)
+
+        day_point = LaundryForecastPoint(
+            datetime=self.base_time,
+            temperature=20.0,
+            humidity=60.0,
+            precipitation_probability=10.0,
+            wind_speed=10.0,
+            condition="sunny",
+            uv_index=7.0,
+            is_daytime=True,
+        )
+        night_point = LaundryForecastPoint(
+            datetime=self.base_time,
+            temperature=20.0,
+            humidity=60.0,
+            precipitation_probability=10.0,
+            wind_speed=10.0,
+            condition="clear-night",
+            uv_index=0.0,
+            is_daytime=False,
+        )
+        self.assertGreater(
+            calculate_laundry_index([day_point]),
+            calculate_laundry_index([night_point]),
+        )
+
+    def test_estimated_drying_time_by_load_type(self) -> None:
+        """Test estimated drying time across light, standard, and heavy loads."""
+        points = [
+            LaundryForecastPoint(
+                datetime=self.base_time + timedelta(hours=i),
+                temperature=26.0,
+                humidity=45.0,
+                precipitation_probability=0.0,
+                wind_speed=14.0,
+                condition="sunny",
+            )
+            for i in range(10)
+        ]
+        light_time = calculate_estimated_drying_time(points, LOAD_TYPE_LIGHT)
+        standard_time = calculate_estimated_drying_time(points, LOAD_TYPE_STANDARD)
+        heavy_time = calculate_estimated_drying_time(points, LOAD_TYPE_HEAVY)
+
+        self.assertIsNotNone(light_time)
+        self.assertIsNotNone(standard_time)
+        self.assertIsNotNone(heavy_time)
+        assert light_time is not None
+        assert standard_time is not None
+        assert heavy_time is not None
+        self.assertLess(light_time, standard_time)
+        self.assertLess(standard_time, heavy_time)
+
+    def test_local_sensor_overrides_and_breakdown(self) -> None:
+        """Test local outdoor sensor overrides and dashboard breakdown attributes."""
+        points = [
+            LaundryForecastPoint(
+                datetime=self.base_time + timedelta(hours=i),
+                temperature=20.0,
+                humidity=65.0,
+                precipitation_probability=10.0,
+                wind_speed=8.0,
+                condition="partlycloudy",
+            )
+            for i in range(4)
+        ]
+        overridden = apply_local_overrides(
+            points,
+            temperature=28.5,
+            humidity=40.0,
+            wind_speed=16.0,
+        )
+        self.assertEqual(overridden[0].temperature, 28.5)
+        self.assertEqual(overridden[0].humidity, 40.0)
+        self.assertEqual(overridden[0].wind_speed, 16.0)
+        self.assertEqual(overridden[1].temperature, 20.0)
+
+        breakdown = calculate_score_breakdown(overridden)
+        self.assertEqual(len(breakdown.hourly_scores), 4)
+        self.assertGreater(breakdown.vpd_kpa, 0.0)
+        self.assertIn("score", breakdown.hourly_scores[0])
+        self.assertIn("vpd_kpa", breakdown.hourly_scores[0])
 
     def test_language_normalization(self) -> None:
         """Test normalization of Home Assistant language codes."""

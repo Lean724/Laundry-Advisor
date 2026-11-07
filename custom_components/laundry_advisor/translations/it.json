@@ -3,16 +3,24 @@
     "step": {
       "user": {
         "title": "Laundry Advisor",
-        "description": "Scegli l'entità meteo utilizzata per calcolare le condizioni di asciugatura del bucato all'aperto.",
+        "description": "Scegli l'entità meteo, il tipo di carico e i sensori esterni locali opzionali per calcolare le condizioni di asciugatura.",
         "data": {
           "weather_entity": "Entità meteo",
           "forecast_hours": "Orizzonte di previsione",
-          "update_interval": "Intervallo di aggiornamento"
+          "update_interval": "Intervallo di aggiornamento",
+          "load_type": "Tipo di carico di bucato",
+          "temperature_sensor": "Sensore locale di temperatura esterna (opzionale)",
+          "humidity_sensor": "Sensore locale di umidità esterna (opzionale)",
+          "wind_speed_sensor": "Sensore locale di velocità del vento (opzionale)"
         },
         "data_description": {
           "weather_entity": "Entità meteo che fornisce dati di previsione orari o giornalieri.",
           "forecast_hours": "Numero di ore di previsione da analizzare (3-48 ore).",
-          "update_interval": "Frequenza di ricalcolo dei consigli per il bucato (5-240 minuti)."
+          "update_interval": "Frequenza di ricalcolo dei consigli per il bucato (5-240 minuti).",
+          "load_type": "Peso dei tessuti utilizzato per stimare la durata di asciugatura.",
+          "temperature_sensor": "Sensore di temperatura esterna in tempo reale per affinare l'ora corrente.",
+          "humidity_sensor": "Sensore di umidità esterna in tempo reale per affinare l'ora corrente.",
+          "wind_speed_sensor": "Sensore di velocità del vento esterno in tempo reale per affinare l'ora corrente."
         }
       }
     },
@@ -27,21 +35,38 @@
     "step": {
       "init": {
         "title": "Opzioni di Laundry Advisor",
-        "description": "Aggiorna l'entità meteo, l'orizzonte di previsione o l'intervallo di aggiornamento.",
+        "description": "Aggiorna l'entità meteo, l'orizzonte di previsione, il tipo di carico o i sensori esterni locali.",
         "data": {
           "weather_entity": "Entità meteo",
           "forecast_hours": "Orizzonte di previsione",
-          "update_interval": "Intervallo di aggiornamento"
+          "update_interval": "Intervallo di aggiornamento",
+          "load_type": "Tipo di carico di bucato",
+          "temperature_sensor": "Sensore locale di temperatura esterna (opzionale)",
+          "humidity_sensor": "Sensore locale di umidità esterna (opzionale)",
+          "wind_speed_sensor": "Sensore locale di velocità del vento (opzionale)"
         },
         "data_description": {
           "weather_entity": "Entità meteo che fornisce dati di previsione orari o giornalieri.",
           "forecast_hours": "Numero di ore di previsione da analizzare (3-48 ore).",
-          "update_interval": "Frequenza di ricalcolo dei consigli per il bucato (5-240 minuti)."
+          "update_interval": "Frequenza di ricalcolo dei consigli per il bucato (5-240 minuti).",
+          "load_type": "Peso dei tessuti utilizzato per stimare la durata di asciugatura.",
+          "temperature_sensor": "Sensore di temperatura esterna in tempo reale per affinare l'ora corrente.",
+          "humidity_sensor": "Sensore di umidità esterna in tempo reale per affinare l'ora corrente.",
+          "wind_speed_sensor": "Sensore di velocità del vento esterno in tempo reale per affinare l'ora corrente."
         }
       }
     },
     "error": {
       "invalid_weather_entity": "Seleziona un'entità meteo valida."
+    }
+  },
+  "selector": {
+    "load_type": {
+      "options": {
+        "light": "Leggero / Sintetici",
+        "standard": "Standard / Cotone",
+        "heavy": "Pesante / Asciugamani e jeans"
+      }
     }
   },
   "entity": {
@@ -63,6 +88,9 @@
       },
       "laundry_drying_window": {
         "name": "Finestra di asciugatura"
+      },
+      "laundry_estimated_drying_time": {
+        "name": "Tempo di asciugatura stimato"
       }
     },
     "binary_sensor": {
