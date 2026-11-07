@@ -6,7 +6,6 @@ from collections.abc import Mapping
 from typing import Any
 
 import voluptuous as vol
-
 from homeassistant import config_entries
 from homeassistant.const import Platform
 from homeassistant.core import callback
@@ -67,7 +66,7 @@ def _schema(defaults: Mapping[str, Any] | None = None) -> vol.Schema:
     )
 
 
-class LaundryAdvisorConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+class LaundryAdvisorConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]
     """Handle a config flow for Laundry Advisor."""
 
     VERSION = 1

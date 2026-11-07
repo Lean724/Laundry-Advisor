@@ -15,7 +15,6 @@ from . import LaundryAdvisorConfigEntry
 from .const import DOMAIN
 from .coordinator import LaundryAdvisorCoordinator
 
-
 GOOD_DAY_DESCRIPTION = BinarySensorEntityDescription(
     key="laundry_good_day",
     translation_key="laundry_good_day",

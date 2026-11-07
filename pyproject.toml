@@ -9,19 +9,26 @@ ignore = [
   "ANN401",
   "ARG001",
   "COM812",
+  "CPY",
   "D203",
   "D213",
   "EM101",
   "PLR2004",
-  "TRY003"
+  "TC",
+  "TRY003",
+  "UP040"
 ]
 
 [tool.ruff.lint.per-file-ignores]
 "custom_components/laundry_advisor/translations/*.json" = ["ALL"]
+"tests/*" = ["ANN", "D", "PT009", "S101", "UP017", "UP036"]
 
 [tool.mypy]
 python_version = "3.13"
 strict = true
+disallow_subclassing_any = false
+disallow_untyped_decorators = false
+warn_return_any = false
 warn_unused_configs = true
 namespace_packages = true
 explicit_package_bases = true

@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
+import logging
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-import logging
 from typing import Any, Protocol, cast
 
 from homeassistant.components.weather import Forecast, async_get_forecasts
@@ -20,8 +20,8 @@ from .const import (
     CONF_WEATHER_ENTITY,
     DEFAULT_FORECAST_HOURS,
     DEFAULT_UPDATE_INTERVAL,
-    DRYING_WINDOW_NONE,
     DOMAIN,
+    DRYING_WINDOW_NONE,
     STATUS_EXCELLENT,
     STATUS_FAIR,
     STATUS_GOOD,
@@ -130,8 +130,9 @@ class LaundryAdvisorCoordinator(DataUpdateCoordinator[LaundryAdvisorData]):
                     err,
                 )
                 forecast = await self._async_get_daily_forecast_as_points()
-        except Exception as err:  # noqa: BLE001
-            raise UpdateFailed(f"Unable to fetch weather forecast: {err}") from err
+        except Exception as err:
+            msg = f"Unable to fetch weather forecast: {err}"
+            raise UpdateFailed(msg) from err
 
         if not forecast:
             raise UpdateFailed("Weather entity did not return forecast data")
@@ -188,17 +189,17 @@ class LaundryAdvisorCoordinator(DataUpdateCoordinator[LaundryAdvisorData]):
         expanded: list[LaundryForecastPoint] = []
 
         for point in points:
-            for hour in range(24):
-                expanded.append(
-                    LaundryForecastPoint(
-                        datetime=point.datetime + timedelta(hours=hour),
-                        temperature=point.temperature,
-                        humidity=point.humidity,
-                        precipitation_probability=point.precipitation_probability,
-                        wind_speed=point.wind_speed,
-                        condition=point.condition,
-                    )
+            expanded.extend(
+                LaundryForecastPoint(
+                    datetime=point.datetime + timedelta(hours=hour),
+                    temperature=point.temperature,
+                    humidity=point.humidity,
+                    precipitation_probability=point.precipitation_probability,
+                    wind_speed=point.wind_speed,
+                    condition=point.condition,
                 )
+                for hour in range(24)
+            )
 
         return expanded
 
@@ -269,6 +270,9 @@ def calculate_drying_window(forecast: Sequence[LaundryForecastPoint]) -> str:
 
     for point in forecast:
         if _is_suitable_hour(point):
+            if current_end is not None and point.datetime > current_end:
+                current_start = None
+                current_end = None
             current_start = current_start or point.datetime
             current_end = point.datetime + timedelta(hours=1)
             if best_start is None or (
