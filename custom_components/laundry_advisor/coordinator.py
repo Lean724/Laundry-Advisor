@@ -11,9 +11,15 @@ from typing import Any, Protocol, cast
 
 from homeassistant.components.weather import Forecast
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import (
+    ATTR_UNIT_OF_MEASUREMENT,
+    UnitOfSpeed,
+    UnitOfTemperature,
+)
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util import dt as dt_util
+from homeassistant.util.unit_conversion import SpeedConverter, TemperatureConverter
 
 from .const import (
     CONF_FORECAST_HOURS,
@@ -167,14 +173,35 @@ class LaundryAdvisorCoordinator(DataUpdateCoordinator[LaundryAdvisorData]):
         val = self.config_entry.data.get(key)
         return str(val) if val else None
 
-    def _read_numeric_sensor(self, entity_id: str | None) -> float | None:
+    def _read_numeric_sensor(
+        self,
+        entity_id: str | None,
+        target_unit: str | None = None,
+    ) -> float | None:
         """Read a float state from an optional local sensor entity."""
         if not entity_id:
             return None
         state = self.hass.states.get(entity_id)
         if state is None or state.state in ("unknown", "unavailable", ""):
             return None
-        return _as_float(state.state)
+        value = _as_float(state.state)
+        unit = (
+            state.attributes.get(ATTR_UNIT_OF_MEASUREMENT)
+            if state.attributes
+            else None
+        )
+        if (
+            value is None
+            or target_unit is None
+            or not isinstance(unit, str)
+            or not unit
+        ):
+            return value
+        if target_unit == UnitOfTemperature.CELSIUS:
+            return _convert_temperature(value, unit)
+        if target_unit == UnitOfSpeed.KILOMETERS_PER_HOUR:
+            return _convert_wind_speed(value, unit)
+        return value
 
     async def _async_update_data(self) -> LaundryAdvisorData:
         """Fetch the latest forecast and calculate laundry advice."""
@@ -201,13 +228,15 @@ class LaundryAdvisorCoordinator(DataUpdateCoordinator[LaundryAdvisorData]):
         forecast = apply_local_overrides(
             forecast,
             temperature=self._read_numeric_sensor(
-                self._get_option_or_data(CONF_TEMP_SENSOR)
+                self._get_option_or_data(CONF_TEMP_SENSOR),
+                UnitOfTemperature.CELSIUS,
             ),
             humidity=self._read_numeric_sensor(
                 self._get_option_or_data(CONF_HUMIDITY_SENSOR)
             ),
             wind_speed=self._read_numeric_sensor(
-                self._get_option_or_data(CONF_WIND_SENSOR)
+                self._get_option_or_data(CONF_WIND_SENSOR),
+                UnitOfSpeed.KILOMETERS_PER_HOUR,
             ),
         )
 
@@ -269,7 +298,25 @@ class LaundryAdvisorCoordinator(DataUpdateCoordinator[LaundryAdvisorData]):
         )
         forecast_dict = cast(dict[str, Any], response or {})
         raw_forecast = _extract_forecast_list(forecast_dict, self.weather_entity)
-        return [_normalize_forecast_point(item) for item in raw_forecast]
+        units = getattr(self.hass.config, "units", None)
+        temperature_unit = getattr(
+            units,
+            "temperature_unit",
+            UnitOfTemperature.CELSIUS,
+        )
+        wind_speed_unit = getattr(
+            units,
+            "wind_speed_unit",
+            UnitOfSpeed.KILOMETERS_PER_HOUR,
+        )
+        return [
+            _normalize_forecast_point(
+                item,
+                temperature_unit=temperature_unit,
+                wind_speed_unit=wind_speed_unit,
+            )
+            for item in raw_forecast
+        ]
 
     async def _async_get_hourly_forecast(self) -> list[LaundryForecastPoint]:
         """Fetch and normalize an hourly forecast using Home Assistant APIs."""
@@ -334,7 +381,50 @@ def _extract_forecast_list(
     return cast(Sequence[Forecast], forecast)
 
 
-def _normalize_forecast_point(forecast: Forecast) -> LaundryForecastPoint:
+def _convert_temperature(
+    value: float | None,
+    from_unit: str | None,
+) -> float | None:
+    """Convert a temperature value to Celsius."""
+    if value is None or not from_unit:
+        return value
+    try:
+        return float(
+            TemperatureConverter.convert(
+                value,
+                from_unit,
+                UnitOfTemperature.CELSIUS,
+            )
+        )
+    except Exception:  # noqa: BLE001
+        return value
+
+
+def _convert_wind_speed(
+    value: float | None,
+    from_unit: str | None,
+) -> float | None:
+    """Convert a wind speed value to km/h."""
+    if value is None or not from_unit:
+        return value
+    try:
+        return float(
+            SpeedConverter.convert(
+                value,
+                from_unit,
+                UnitOfSpeed.KILOMETERS_PER_HOUR,
+            )
+        )
+    except Exception:  # noqa: BLE001
+        return value
+
+
+def _normalize_forecast_point(
+    forecast: Forecast,
+    *,
+    temperature_unit: str = UnitOfTemperature.CELSIUS,
+    wind_speed_unit: str = UnitOfSpeed.KILOMETERS_PER_HOUR,
+) -> LaundryForecastPoint:
     """Normalize Home Assistant forecast dictionaries into scoring points."""
     forecast_dict = cast(dict[str, Any], forecast)
     raw_datetime = forecast_dict.get("datetime")
@@ -361,16 +451,16 @@ def _normalize_forecast_point(forecast: Forecast) -> LaundryForecastPoint:
 
     return LaundryForecastPoint(
         datetime=dt_util.as_local(point_datetime),
-        temperature=_as_float(raw_temp),
+        temperature=_convert_temperature(_as_float(raw_temp), temperature_unit),
         humidity=_as_float(forecast_dict.get("humidity")),
         precipitation_probability=_as_float(
             forecast_dict.get("precipitation_probability")
         ),
-        wind_speed=_as_float(raw_wind),
+        wind_speed=_convert_wind_speed(_as_float(raw_wind), wind_speed_unit),
         condition=(
             str(forecast_dict["condition"]) if forecast_dict.get("condition") else None
         ),
-        dew_point=_as_float(raw_dew),
+        dew_point=_convert_temperature(_as_float(raw_dew), temperature_unit),
         uv_index=_as_float(forecast_dict.get("uv_index")),
         cloud_coverage=_as_float(forecast_dict.get("cloud_coverage")),
         is_daytime=is_daytime,

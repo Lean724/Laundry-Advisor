@@ -31,6 +31,12 @@ from .const import (
     MIN_UPDATE_INTERVAL_MINUTES,
 )
 
+OPTIONAL_SENSOR_KEYS: tuple[str, ...] = (
+    CONF_TEMP_SENSOR,
+    CONF_HUMIDITY_SENSOR,
+    CONF_WIND_SENSOR,
+)
+
 
 def _optional_entity_field(
     key: str,
@@ -144,9 +150,10 @@ class LaundryAdvisorConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # typ
             else:
                 await self.async_set_unique_id(weather_entity)
                 self._abort_if_unique_id_configured()
+                data = dict.fromkeys(OPTIONAL_SENSOR_KEYS) | user_input
                 return self.async_create_entry(
                     title=state.name or weather_entity,
-                    data=user_input,
+                    data=data,
                 )
 
         return self.async_show_form(
@@ -187,7 +194,8 @@ class LaundryAdvisorOptionsFlow(config_entries.OptionsFlow):
             if state is None or not weather_entity.startswith(f"{Platform.WEATHER}."):
                 errors["base"] = "invalid_weather_entity"
             else:
-                return self.async_create_entry(title="", data=user_input)
+                data = dict.fromkeys(OPTIONAL_SENSOR_KEYS) | user_input
+                return self.async_create_entry(title="", data=data)
 
         entry = self._config_entry or self.config_entry
         defaults = {**entry.data, **entry.options}
