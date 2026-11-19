@@ -4,9 +4,7 @@
 [![Marketplace validation](https://github.com/Lean724/Laundry-Advisor/actions/workflows/hacs.yml/badge.svg)](https://github.com/Lean724/Laundry-Advisor/actions/workflows/hacs.yml)
 [![Hassfest](https://github.com/Lean724/Laundry-Advisor/actions/workflows/hassfest.yml/badge.svg)](https://github.com/Lean724/Laundry-Advisor/actions/workflows/hassfest.yml)
 
-Laundry Advisor is a Home Assistant custom integration that analyzes weather
-forecasts and optional real-time outdoor sensors to recommend whether it is a
-good moment to wash clothes and dry them outdoors.
+Laundry Advisor is a **Home Assistant laundry advisor integration** that analyzes weather forecasts and optional real-time outdoor sensors to recommend the best time to wash clothes and dry laundry outdoors. It combines a laundry weather forecast, outdoor drying conditions, and local sensor data in one Home Assistant integration.
 
 It works with any `weather.*` entity that supports Home Assistant's modern
 forecast APIs. The integration is available directly in the Home Assistant
